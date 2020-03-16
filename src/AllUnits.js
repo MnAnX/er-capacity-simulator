@@ -52,7 +52,7 @@ class AllUnits extends Component {
 
 	render() {
 		return (
-			<GridList cellHeight={160} spacing={20} cols={8}>
+			<GridList cellHeight={320} spacing={20} cols={5}>
         {Object.values(this.props.app.units).map(unit => (
 					<GridListTile key={unit.id} cols={1}>
 						<EmergencyRoom

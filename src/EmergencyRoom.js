@@ -4,10 +4,11 @@ import { bindActionCreators } from 'redux';
 import * as actionCreators from './actions/app';
 
 import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
-import Typography from '@material-ui/core/Typography';
+import TextField from '@material-ui/core/TextField';
+import Chip from '@material-ui/core/Chip';
 
+import Padding from './components/Padding'
 
 class EmergencyRoom extends Component {
 	constructor(props) {
@@ -117,8 +118,8 @@ class EmergencyRoom extends Component {
 		// Calculate status of this ER unit
 		let available_staffs = this.state.num_total_staffs - staffs_quanrentined.length
 		let available_wards = this.state.num_total_wards - wards_occupied.length
-		let status = this.state.status
-		let status_info = this.state.status_info
+		let status = "Normal"
+		let status_info = ""
 		if (available_staffs < (this.state.num_total_staffs / 2)) {
 			status = "Critical"
 			status_info = "Understaffed"
@@ -162,17 +163,27 @@ class EmergencyRoom extends Component {
 		return (
 			<Card style={{ backgroundColor: this.state.status_color }}>
 				<CardContent>
-					<Typography variant="body2" component="p">
-	          {this.state.day_count}
+						<TextField id="name"
+							variant="outlined"
+							value={this.state.name}
+							onChange={(event)=>this.setState({name: event.target.value})} />
+						<Padding height={10}/>
+						<TextField id="total-workers"
+							variant="outlined"
+							label="Total Healthcare Workers"
+							value={this.state.num_total_staffs}
+							onChange={(event)=>this.setState({num_total_staffs: parseInt(event.target.value, 10)})} />
+						<Padding height={10}/>
+						<TextField id="total-wards"
+							variant="outlined"
+							label="Total Wards"
+							value={this.state.num_total_wards}
+							onChange={(event)=>this.setState({num_total_wards: parseInt(event.target.value, 10)})} />
+						<Padding height={10}/>
+						{this.state.status_info !== "" && <div><Chip label={this.state.status_info} color="primary" /><br /></div>}
+						{"Staffs Infected: " + this.state.staffs_quanrentined.length}
 						<br />
-						{this.state.status}
-						<br />
-						{this.state.status_info}
-						<br />
-						{this.state.num_total_staffs - this.state.staffs_quanrentined.length}
-						<br />
-						{this.state.num_total_wards - this.state.wards_occupied.length}
-	        </Typography>
+						{"Wards Taken: " + this.state.wards_occupied.length}
 				</CardContent>
 			</Card>
 		);
