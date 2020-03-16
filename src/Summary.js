@@ -3,6 +3,9 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actionCreators from './actions/app';
 
+import Grid from '@material-ui/core/Grid';
+import Padding from './components/Padding'
+
 
 class Summary extends Component {
 	constructor(props) {
@@ -10,11 +13,29 @@ class Summary extends Component {
   }
 
 	render() {
+		let num_units_green = this.props.app.day_count > 0 ? this.props.app.num_units_green : this.props.config.total_num_units
 		return (
-			<div>
+			<Grid container justify="center">
 				<h2>Day {this.props.app.day_count}</h2>
-				<h4>New Patients: {this.props.app.num_new_patients}</h4>
-			</div>
+				<Grid container justify="center">
+					<Grid item>
+						<h4>Daily New Patients: {this.props.app.num_new_patients}</h4>
+						<h4>Total Patients: {this.props.app.num_current_patients}</h4>
+					</Grid>
+					<Padding width="10%" />
+					<Grid item>
+						<h4>In Green: {num_units_green} / {this.props.config.total_num_units}</h4>
+						<h4>In Yellow: {this.props.app.num_units_yellow} / {this.props.config.total_num_units}</h4>
+						<h4>In Red: {this.props.app.num_units_red} / {this.props.config.total_num_units}</h4>
+					</Grid>
+					<Padding width="10%" />
+					<Grid item>
+						<h4>Understaffed: {this.props.app.num_units_understaffed} / {this.props.config.total_num_units}</h4>
+						<h4>No ICU: {this.props.app.num_units_no_icu} / {this.props.config.total_num_units}</h4>
+						<h4>No Bed: {this.props.app.num_units_no_bed} / {this.props.config.total_num_units}</h4>
+					</Grid>
+	      </Grid>
+			</Grid>
 		);
 	}
 }
