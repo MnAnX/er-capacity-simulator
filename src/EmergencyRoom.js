@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actionCreators from './actions/app';
 
-import _ from 'lodash'
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
@@ -14,20 +13,22 @@ class EmergencyRoom extends Component {
 	constructor(props) {
     super(props);
 		this.state = {
+			restart_id: this.props.app.restart_id,
 			id: props.id,
 			status: props.init_status,
 			status_info: "",
+			status_color: "green",
 			day_count: this.props.app.day_count,
-			name: "Hospital_1",
+			name: "Hospital_" + props.id,
 			num_total_staffs: 10,
 			num_total_wards: 5,
-			staffs_num_threshold: 4,
 			staffs_quanrentined: [],
 			wards_occupied: [],
 		}
 
 		this.setConfig = this.setConfig.bind(this)
 		this.dailyCalc = this.dailyCalc.bind(this)
+		this.clearState = this.clearState.bind(this)
   }
 
 	componentWillMount() {
@@ -35,14 +36,28 @@ class EmergencyRoom extends Component {
   }
 
 	componentWillReceiveProps(nextProps) {
-		if(nextProps.app.day_count) {
+		if(nextProps.app.day_count != this.state.day_count) {
 			this.setState({day_count: nextProps.app.day_count})
 			this.dailyCalc(nextProps.app.units[this.state.id])
 		}
 		if(nextProps.config) {
 			this.setConfig(nextProps.config)
 		}
+		if(nextProps.app.restart_id != this.state.restart_id) {
+			this.setState({restart_id: nextProps.app.restart_id})
+			this.clearState()
+		}
   }
+
+	clearState() {
+		this.setState({
+			status: "Normal",
+			status_info: "",
+			status_color: "green",
+			staffs_quanrentined: [],
+			wards_occupied: [],
+		})
+	}
 
 	setConfig(config) {
 		this.setState({
@@ -55,8 +70,7 @@ class EmergencyRoom extends Component {
 	}
 
 	dailyCalc(unitState) {
-		//let new_patients = unitState.new_cases
-		let new_patients = 10
+		let new_patients = unitState.new_patients
 		// Calculate Staff Status
 		let staffs_quanrentined = this.state.staffs_quanrentined
 		// Check if any staff is out of quanrentine
@@ -70,7 +84,7 @@ class EmergencyRoom extends Component {
 		for (let i = 0; i < encounters; i++) {
 		  let roll_dice = Math.floor(Math.random() * Math.floor(100))
 			if (roll_dice < this.state.prob_of_staff_infected) {
-				newly_infected_staffs += 1
+				newly_infected_staffs++
 			}
 		}
 		// Each infected staff needs to start self-quanrentine
@@ -85,7 +99,13 @@ class EmergencyRoom extends Component {
 											.map(days_occupied => days_occupied - 1)
 											.filter(days_occupied => days_occupied > 0)
 		// New patients that need wards
-		let new_patients_need_ward = Math.floor(new_patients * this.state.prc_patients_in_serious_cond / 100)
+		let new_patients_need_ward = 0
+		for (let i = 0; i < new_patients; i++) {
+			let roll_dice = Math.floor(Math.random() * Math.floor(100))
+			if (roll_dice < this.state.prc_patients_in_serious_cond) {
+				new_patients_need_ward++
+			}
+		}
 		let num_available_wards = this.state.num_total_wards - wards_occupied.length
 		// Put patients into wards
 		let assign_wards = Math.min(num_available_wards, new_patients_need_ward)
@@ -99,7 +119,11 @@ class EmergencyRoom extends Component {
 		let available_wards = this.state.num_total_wards - wards_occupied.length
 		let status = this.state.status
 		let status_info = this.state.status_info
-		if (available_staffs < this.state.staffs_num_threshold) {
+		if (available_staffs < (this.state.num_total_staffs / 2)) {
+			status = "Critical"
+			status_info = "Understaffed"
+		}
+		if (available_staffs < (this.state.num_total_staffs / 4)) {
 			status = "Down"
 			status_info = "Understaffed"
 		}
@@ -108,18 +132,35 @@ class EmergencyRoom extends Component {
 			status_info = "No Ward Available"
 		}
 
+		let status_color = this.state.status_color
+		switch (status) {
+			case "Normal":
+				status_color = "green"; break;
+			case "Critical":
+				status_color = "orange"; break;
+			case "Down":
+				status_color = "red"; break;
+		}
+
 		// Update State
 		this.setState({
 			staffs_quanrentined,
 			wards_occupied,
 			status,
 			status_info,
+			status_color,
+		})
+
+		// Update the centralized unit status
+		this.props.updateUnit(this.state.id, {
+			status: this.state.status,
+			status_info: this.state.status_info,
 		})
 	}
 
 	render() {
 		return (
-			<Card>
+			<Card style={{ backgroundColor: this.state.status_color }}>
 				<CardContent>
 					<Typography variant="body2" component="p">
 	          {this.state.day_count}

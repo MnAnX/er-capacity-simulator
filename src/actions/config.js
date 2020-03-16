@@ -1,7 +1,8 @@
-export const TBD = 'TBD';
+export const UPDATE_CONFIG = 'UPDATE_CONFIG';
 
-export const tbd = () => async dispatch => {
+export const updateConfig = (config) => async dispatch => {
   dispatch({
-	  type: TBD,
+	  type: UPDATE_CONFIG,
+    config,
 	});
 };

@@ -1,24 +1,47 @@
 import React from 'react';
 
-import GridList from '@material-ui/core/GridList';
+import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import blue from '@material-ui/core/colors/blue';
+import green from '@material-ui/core/colors/green';
+import Paper from '@material-ui/core/Paper';
+import Container from '@material-ui/core/Container';
 
+import Config from './Config'
 import Control from './Control'
-import EmergencyRoom from './EmergencyRoom'
+import Summary from './Summary'
+import AllUnits from './AllUnits'
+
+const theme = createMuiTheme({
+  palette: {
+    type: 'dark',
+    primary: blue,
+    secondary: green,
+  },
+});
 
 function App() {
   return (
-    <div>
-      <h1>COVID-19: ER Capacity Simulation</h1>
-      <Control />
-      <GridList cellHeight={160} cols={3}>
-        {[1,2].map(tile => (
-          <EmergencyRoom
-            id="123"
-            init_status="Normal"
-          />
-        ))}
-      </GridList>
-    </div>
+    <ThemeProvider theme={theme}>
+      <Container>
+        <h1>COVID-19: ER Capacity Simulator</h1>
+        <Container>
+          <Paper>
+            <h2>Configuration</h2>
+            <Config />
+          </Paper>
+        </Container>
+        <Container>
+          <Paper>
+            <h2>Run Simulation</h2>
+            <Summary />
+            <br />
+            <Control />
+            <br />
+            <AllUnits />
+          </Paper>
+        </Container>
+      </Container>
+    </ThemeProvider>
   );
 }
 
