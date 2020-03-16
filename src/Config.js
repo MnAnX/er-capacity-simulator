@@ -21,9 +21,10 @@ class Config extends Component {
 			ver: this.props.config.ver,
 			total_num_units: this.props.config.total_num_units,
 			prob_of_staff_infected: this.props.config.prob_of_staff_infected,
-			prc_patients_in_serious_cond: this.props.config.prc_patients_in_serious_cond,
+			prc_patients_needs_bed: this.props.config.prc_patients_needs_bed,
+			prc_patients_needs_icu: this.props.config.prc_patients_needs_icu,
 			staff_encounter_per_patient: this.props.config.staff_encounter_per_patient,
-			init_num_patients: this.props.config.init_num_patients,
+			num_patients_growth_basis: this.props.config.num_patients_growth_basis,
 			num_patients_growth_factor: this.props.config.num_patients_growth_factor,
 		}
   }
@@ -33,6 +34,7 @@ class Config extends Component {
 			<Container>
 				<Container>
 					<TextField id="total_num_units"
+						type='number'
 						variant="outlined"
 						label="Number of Hospital/ERs"
 						helperText="How many hospitals/ERs in this area"
@@ -70,11 +72,24 @@ class Config extends Component {
 					<Padding height={10}/>
 					<div>
 						<p>
-			        Percentage of Patients in Serious Condition (How many patients out of 100 will need a ward)
+			        Percentage of patients needs to be admitted (How many patients out of 100 will need a bed?)
 			      </p>
 						<Slider
-							onChange={(event, value)=>this.setState({prc_patients_in_serious_cond: value})}
+							onChange={(event, value)=>this.setState({prc_patients_needs_bed: value})}
 			        defaultValue={20}
+							getAriaValueText={(val)=>`${val}%`}
+			        aria-labelledby="discrete-slider"
+			        valueLabelDisplay="auto"
+			        step={10}
+			      />
+					</div>
+					<div>
+						<p>
+			        Percentage of patients needs ICU (How many patients out of 100 will need intensive care?)
+			      </p>
+						<Slider
+							onChange={(event, value)=>this.setState({prc_patients_needs_icu: value})}
+			        defaultValue={2}
 							getAriaValueText={(val)=>`${val}%`}
 			        aria-labelledby="discrete-slider"
 			        valueLabelDisplay="auto"
@@ -104,12 +119,14 @@ class Config extends Component {
 			      </p>
 						<div style={{display: 'flex', flexDirection: 'row'}}>
 							<TextField id="patients-growth-basis"
+								type='number'
 								variant="outlined"
 								label="Patients Growth Basis"
-								value={this.state.init_num_patients}
-								onChange={(event)=>this.setState({init_num_patients: event.target.value})} />
+								value={this.state.num_patients_growth_basis}
+								onChange={(event)=>this.setState({num_patients_growth_basis: event.target.value})} />
 							<Padding width={20}/>
 							<TextField id="patients-growth-factor"
+								type='number'
 								variant="outlined"
 								label="Patients Growth Factor"
 								value={this.state.num_patients_growth_factor}
@@ -118,13 +135,14 @@ class Config extends Component {
 					</div>
 				</Container>
 				<Padding height={20}/>
-				<Button variant="contained" color="primary" onClick={()=>{
+				<Button size="large" variant="contained" color="primary" onClick={()=>{
 					this.props.updateConfig({
 						total_num_units: this.state.total_num_units,
 						prob_of_staff_infected: this.state.prob_of_staff_infected,
-						prc_patients_in_serious_cond: this.state.prc_patients_in_serious_cond,
+						prc_patients_needs_bed: this.state.prc_patients_needs_bed,
+						prc_patients_needs_icu: this.state.prc_patients_needs_icu,
 						staff_encounter_per_patient: this.state.staff_encounter_per_patient,
-						init_num_patients: this.state.init_num_patients,
+						num_patients_growth_basis: this.state.num_patients_growth_basis,
 						num_patients_growth_factor: this.state.num_patients_growth_factor,
 					})
 				}}>Update Configuration</Button>

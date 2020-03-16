@@ -17,32 +17,28 @@ class EmergencyRoom extends Component {
 			restart_id: this.props.app.restart_id,
 			id: props.id,
 			status: props.init_status,
-			status_info: "",
+			status_info: [],
 			status_color: "green",
 			day_count: this.props.app.day_count,
 			name: "Hospital_" + props.id,
-			num_total_staffs: 10,
-			num_total_wards: 5,
-			staffs_quanrentined: [],
-			wards_occupied: [],
+			num_total_providers: 10,
+			num_total_nurses: 30,
+			num_total_beds: 500,
+			num_total_icus: 30,
+			providers_quanrentined: [],
+			nurses_quanrentined: [],
+			beds_occupied: [],
+			icus_occupied: [],
 		}
 
-		this.setConfig = this.setConfig.bind(this)
 		this.dailyCalc = this.dailyCalc.bind(this)
 		this.clearState = this.clearState.bind(this)
-  }
-
-	componentWillMount() {
-    this.setConfig(this.props.config)
   }
 
 	componentWillReceiveProps(nextProps) {
 		if(nextProps.app.day_count != this.state.day_count) {
 			this.setState({day_count: nextProps.app.day_count})
 			this.dailyCalc(nextProps.app.units[this.state.id])
-		}
-		if(nextProps.config) {
-			this.setConfig(nextProps.config)
 		}
 		if(nextProps.app.restart_id != this.state.restart_id) {
 			this.setState({restart_id: nextProps.app.restart_id})
@@ -55,82 +51,126 @@ class EmergencyRoom extends Component {
 			status: "Normal",
 			status_info: "",
 			status_color: "green",
-			staffs_quanrentined: [],
-			wards_occupied: [],
-		})
-	}
-
-	setConfig(config) {
-		this.setState({
-			quanrentine_days: config.quanrentine_days,
-			ward_release_days: config.ward_release_days,
-			prob_of_staff_infected: config.prob_of_staff_infected,
-			prc_patients_in_serious_cond: config.prc_patients_in_serious_cond,
-			staff_encounter_per_patient: config.staff_encounter_per_patient,
+			providers_quanrentined: [],
+			beds_occupied: [],
 		})
 	}
 
 	dailyCalc(unitState) {
 		let new_patients = unitState.new_patients
-		// Calculate Staff Status
-		let staffs_quanrentined = this.state.staffs_quanrentined
+
+		// Calculate Providers Status
+		let providers_quanrentined = this.state.providers_quanrentined
 		// Check if any staff is out of quanrentine
-		staffs_quanrentined = staffs_quanrentined
+		providers_quanrentined = providers_quanrentined
 														.map(days_in_quanrentine => days_in_quanrentine - 1)
 														.filter(days_in_quanrentine => days_in_quanrentine > 0)
 		// Calculate how many staffs may get infected due to the new incoming cases
-		let staffs_in_duty = this.state.num_total_staffs - staffs_quanrentined.length
-		let encounters = Math.min(new_patients * this.state.staff_encounter_per_patient, staffs_in_duty)
-		let newly_infected_staffs = 0
+		let providers_in_duty = this.state.num_total_providers - providers_quanrentined.length
+		let encounters = Math.min(new_patients * this.props.config.staff_encounter_per_patient, providers_in_duty)
+		let newly_infected_providers = 0
 		for (let i = 0; i < encounters; i++) {
 		  let roll_dice = Math.floor(Math.random() * Math.floor(100))
-			if (roll_dice < this.state.prob_of_staff_infected) {
-				newly_infected_staffs++
+			if (roll_dice < this.props.config.prob_of_staff_infected) {
+				newly_infected_providers++
 			}
 		}
 		// Each infected staff needs to start self-quanrentine
-		for (let i = 0; i < newly_infected_staffs; i++) {
-			staffs_quanrentined.push(this.state.quanrentine_days)
+		for (let i = 0; i < newly_infected_providers; i++) {
+			providers_quanrentined.push(this.props.config.quanrentine_days)
 		}
 
-		// Calculate Ward Status
-		let wards_occupied = this.state.wards_occupied
-		// Check if any ward is released
-		wards_occupied = wards_occupied
-											.map(days_occupied => days_occupied - 1)
-											.filter(days_occupied => days_occupied > 0)
-		// New patients that need wards
-		let new_patients_need_ward = 0
-		for (let i = 0; i < new_patients; i++) {
-			let roll_dice = Math.floor(Math.random() * Math.floor(100))
-			if (roll_dice < this.state.prc_patients_in_serious_cond) {
-				new_patients_need_ward++
+		// Calculate Nurses Status
+		let nurses_quanrentined = this.state.nurses_quanrentined
+		// Check if any staff is out of quanrentine
+		nurses_quanrentined = nurses_quanrentined
+														.map(days_in_quanrentine => days_in_quanrentine - 1)
+														.filter(days_in_quanrentine => days_in_quanrentine > 0)
+		// Calculate how many staffs may get infected due to the new incoming cases
+		let nurses_in_duty = this.state.num_total_nurses - nurses_quanrentined.length
+		let nurse_encounters = Math.min(new_patients * this.props.config.staff_encounter_per_patient, nurses_in_duty)
+		let newly_infected_nurses = 0
+		for (let i = 0; i < nurse_encounters; i++) {
+		  let roll_dice = Math.floor(Math.random() * Math.floor(100))
+			if (roll_dice < this.props.config.prob_of_staff_infected) {
+				newly_infected_nurses++
 			}
 		}
-		let num_available_wards = this.state.num_total_wards - wards_occupied.length
-		// Put patients into wards
-		let assign_wards = Math.min(num_available_wards, new_patients_need_ward)
-		for (let i = 0; i < assign_wards; i++) {
-			wards_occupied.push(this.state.ward_release_days)
+		// Each infected staff needs to start self-quanrentine
+		for (let i = 0; i < newly_infected_nurses; i++) {
+			nurses_quanrentined.push(this.props.config.quanrentine_days)
 		}
-		// TODO: when new_patients_need_ward > num_available_wards, need to transfer patients to other hospitals
+
+		// Calculate Beds Status
+		let beds_occupied = this.state.beds_occupied
+		// Check if any bed is released
+		beds_occupied = beds_occupied
+											.map(days_occupied => days_occupied - 1)
+											.filter(days_occupied => days_occupied > 0)
+		// New patients that need bed
+		let new_patients_need_bed = 0
+		for (let i = 0; i < new_patients; i++) {
+			let roll_dice = Math.floor(Math.random() * Math.floor(100))
+			if (roll_dice < this.props.config.prc_patients_needs_bed) {
+				new_patients_need_bed++
+			}
+		}
+		let num_available_beds = this.state.num_total_beds - beds_occupied.length
+		// Put patients into bed
+		let assign_beds = Math.min(num_available_beds, new_patients_need_bed)
+		for (let i = 0; i < assign_beds; i++) {
+			beds_occupied.push(this.props.config.bed_turnover_days)
+		}
+		// TODO: when new_patients_need_bed > num_available_beds, need to transfer patients to other hospitals
+
+		// Calculate ICUs Status
+		let icus_occupied = this.state.icus_occupied
+		// Check if any bed is released
+		icus_occupied = icus_occupied
+											.map(days_occupied => days_occupied - 1)
+											.filter(days_occupied => days_occupied > 0)
+		// New patients that need ICU
+		let new_patients_need_icu = 0
+		for (let i = 0; i < new_patients; i++) {
+			let roll_dice = Math.floor(Math.random() * Math.floor(100))
+			if (roll_dice < this.props.config.prc_patients_needs_icu) {
+				new_patients_need_icu++
+			}
+		}
+		let num_available_icus = this.state.num_total_icus - icus_occupied.length
+		// Put patients into ICU
+		let assign_icus = Math.min(num_available_icus, new_patients_need_icu)
+		for (let i = 0; i < assign_icus; i++) {
+			icus_occupied.push(this.props.config.icu_turnover_days)
+		}
+		// TODO: when new_patients_need_icu > num_available_icus, need to transfer patients to other hospitals
 
 		// Calculate status of this ER unit
-		let available_staffs = this.state.num_total_staffs - staffs_quanrentined.length
-		let available_wards = this.state.num_total_wards - wards_occupied.length
+		let available_providers = this.state.num_total_providers - providers_quanrentined.length
+		let available_nurses = this.state.num_total_nurses - nurses_quanrentined.length
+		let available_beds = this.state.num_total_beds - beds_occupied.length
+		let available_icus = this.state.num_total_icus - icus_occupied.length
 		let status = "Normal"
-		let status_info = ""
-		if (available_staffs < (this.state.num_total_staffs / 2)) {
+		let status_info = []
+		if (available_providers < (this.state.num_total_providers / 2) || available_nurses < (this.state.num_total_nurses / 2)) {
 			status = "Critical"
-			status_info = "Understaffed"
+			status_info.push("Understaffed")
 		}
-		if (available_staffs < (this.state.num_total_staffs / 4)) {
-			status = "Down"
-			status_info = "Understaffed"
+		if (available_icus < 1) {
+			status = "Critical"
+			status_info.push("No ICU")
 		}
-		if (available_wards < 1) {
+		if (available_providers < 1) {
 			status = "Down"
-			status_info = "No Ward Available"
+			status_info = ["No Provider"]
+		}
+		if (available_nurses < 1) {
+			status = "Down"
+			status_info = ["No Nurse"]
+		}
+		if (available_beds < 1 && available_icus < 1) {
+			status = "Down"
+			status_info = ["Can't Admit"]
 		}
 
 		let status_color = this.state.status_color
@@ -145,8 +185,9 @@ class EmergencyRoom extends Component {
 
 		// Update State
 		this.setState({
-			staffs_quanrentined,
-			wards_occupied,
+			providers_quanrentined,
+			nurses_quanrentined,
+			beds_occupied,
 			status,
 			status_info,
 			status_color,
@@ -154,8 +195,8 @@ class EmergencyRoom extends Component {
 
 		// Update the centralized unit status
 		this.props.updateUnit(this.state.id, {
-			status: this.state.status,
-			status_info: this.state.status_info,
+			status,
+			status_info,
 		})
 	}
 
@@ -168,22 +209,45 @@ class EmergencyRoom extends Component {
 							value={this.state.name}
 							onChange={(event)=>this.setState({name: event.target.value})} />
 						<Padding height={10}/>
-						<TextField id="total-workers"
+						<TextField id="total-providers"
 							variant="outlined"
-							label="Total Healthcare Workers"
-							value={this.state.num_total_staffs}
-							onChange={(event)=>this.setState({num_total_staffs: parseInt(event.target.value, 10)})} />
+							label="Providers"
+							value={this.state.num_total_providers}
+							onChange={(event)=>this.setState({num_total_providers: parseInt(event.target.value, 10)})} />
 						<Padding height={10}/>
-						<TextField id="total-wards"
+						<TextField id="total-nurses"
 							variant="outlined"
-							label="Total Wards"
-							value={this.state.num_total_wards}
-							onChange={(event)=>this.setState({num_total_wards: parseInt(event.target.value, 10)})} />
+							label="Nurses"
+							value={this.state.num_total_nurses}
+							onChange={(event)=>this.setState({num_total_nurses: parseInt(event.target.value, 10)})} />
 						<Padding height={10}/>
-						{this.state.status_info !== "" && <div><Chip label={this.state.status_info} color="primary" /><br /></div>}
-						{"Staffs Infected: " + this.state.staffs_quanrentined.length}
+						<TextField id="total-beds"
+							variant="outlined"
+							label="Beds"
+							value={this.state.num_total_beds}
+							onChange={(event)=>this.setState({num_total_beds: parseInt(event.target.value, 10)})} />
+						<Padding height={10}/>
+						<TextField id="total-icus"
+							variant="outlined"
+							label="ICUs"
+							value={this.state.num_total_icus}
+							onChange={(event)=>this.setState({num_total_icus: parseInt(event.target.value, 10)})} />
+						<Padding height={10}/>
+						{this.state.status_info.length > 0 &&
+							<div>
+								{this.state.status_info.map(info =>
+									<Chip label={info} color="primary" />
+								)}
+								<br />
+							</div>
+						}
+						{"Providers In Duty: " + (this.state.num_total_providers - this.state.providers_quanrentined.length)}
 						<br />
-						{"Wards Taken: " + this.state.wards_occupied.length}
+						{"Nurses In Duty: " + (this.state.num_total_nurses - this.state.nurses_quanrentined.length)}
+						<br />
+						{"Beds Available: " + (this.state.num_total_beds - this.state.beds_occupied.length)}
+						<br />
+						{"ICUs Available: " + (this.state.num_total_icus - this.state.icus_occupied.length)}
 				</CardContent>
 			</Card>
 		);
