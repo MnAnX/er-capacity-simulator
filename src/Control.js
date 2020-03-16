@@ -3,8 +3,10 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actionCreators from './actions/app';
 
-import _ from 'lodash'
 import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
+import Padding from './components/Padding'
+import SkipNextIcon from '@material-ui/icons/SkipNext';
 
 class Control extends Component {
 	constructor(props) {
@@ -18,8 +20,8 @@ class Control extends Component {
 		let num_current_patients = this.props.app.num_current_patients
 		if (this.props.app.day_count === 0) {
 			// init patinet number
-			this.props.updateNumPatients(this.props.config.init_num_patients, 0)
-			num_current_patients = this.props.config.init_num_patients
+			this.props.updateNumPatients(this.props.config.num_patients_growth_basis, 0)
+			num_current_patients = this.props.config.num_patients_growth_basis
 		}
 
 		// calculate number of new patients
@@ -64,14 +66,30 @@ class Control extends Component {
 
 	render() {
 		return (
-			<div>
-				<Button variant="outlined" color="secondary" onClick={()=>{
-					this.props.restart()
-				}}>Restart</Button>
-				<Button variant="contained" color="secondary" onClick={()=>{
-					this.nextDay()
-				}}>Next Day</Button>
-			</div>
+			<Grid container justify="center">
+				<Button
+					size="large"
+					variant="outlined"
+					color="secondary"
+					onClick={()=>{
+						this.props.restart()
+					}}
+				>
+					Restart
+				</Button>
+				<Padding width={40} />
+				<Button
+					size="large"
+					variant="contained"
+					color="secondary"
+					endIcon={<SkipNextIcon />}
+					onClick={()=>{
+						this.nextDay()
+					}}
+				>
+					Next Day
+				</Button>
+			</Grid>
 		);
 	}
 }

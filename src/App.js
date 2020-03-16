@@ -26,18 +26,23 @@ function App() {
         <h1>COVID-19: ER Capacity Simulator</h1>
         <Container>
           <Paper>
-            <h2>Configuration</h2>
-            <Config />
+            <Container>
+              <h2>Configuration</h2>
+              <br />
+              <Config />
+            </Container>
           </Paper>
         </Container>
         <Container>
           <Paper>
-            <h2>Run Simulation</h2>
-            <Summary />
-            <br />
-            <Control />
-            <br />
-            <AllUnits />
+            <Container>
+              <h2>Run Simulation</h2>
+              <Control />
+              <br />
+              <Summary />
+              <br />
+              <AllUnits />
+            </Container>
           </Paper>
         </Container>
       </Container>

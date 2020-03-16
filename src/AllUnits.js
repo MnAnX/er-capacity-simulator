@@ -41,6 +41,8 @@ class AllUnits extends Component {
 			let unit = {
 				id: i,
 				new_patients: 0,
+				status: "Normal",
+				status_info: []
 			}
 			units[i] = unit
 		}
@@ -52,7 +54,7 @@ class AllUnits extends Component {
 
 	render() {
 		return (
-			<GridList cellHeight={320} spacing={20} cols={5}>
+			<GridList cellHeight={500} spacing={20} cols={5}>
         {Object.values(this.props.app.units).map(unit => (
 					<GridListTile key={unit.id} cols={1}>
 						<EmergencyRoom
