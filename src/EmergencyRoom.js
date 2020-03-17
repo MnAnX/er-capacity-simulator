@@ -154,17 +154,21 @@ class EmergencyRoom extends Component {
 			status = "Critical"
 			status_info.push("No ICU")
 		}
+		if (available_beds < 1) {
+			status = "Critical"
+			status_info.push("No Bed")
+		}
 		if (available_providers < 1) {
 			status = "Down"
-			status_info = ["No Provider"]
+			status_info.push("No Provider")
 		}
 		if (available_nurses < 1) {
 			status = "Down"
-			status_info = ["No Nurse"]
+			status_info.push("No Nurse")
 		}
 		if (available_beds < 1 && available_icus < 1) {
 			status = "Down"
-			status_info = ["Can't Admit"]
+			status_info.push("Can't Admit")
 		}
 
 		let status_color = this.state.status_color

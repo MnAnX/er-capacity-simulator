@@ -44,7 +44,7 @@ export default (state = defaultState, action) => {
 			let num_units_green = Object.values(units).filter(unit => unit.status === "Normal").length
 			let num_units_yellow = Object.values(units).filter(unit => unit.status === "Critical").length
 			let num_units_red = Object.values(units).filter(unit => unit.status === "Down").length
-			let num_units_understaffed = Object.values(units).filter(unit => unit.status_info.includes("Understaffed") || unit.status_info.includes("No Staff")).length
+			let num_units_understaffed = Object.values(units).filter(unit => unit.status_info.includes("Understaffed") || unit.status_info.includes("No Provider") || unit.status_info.includes("No Nurse")).length
 			let num_units_no_icu = Object.values(units).filter(unit => unit.status_info.includes("No ICU")).length
 			let num_units_no_bed = Object.values(units).filter(unit => unit.status_info.includes("Can't Admit")).length
 			return {

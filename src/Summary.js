@@ -24,9 +24,9 @@ class Summary extends Component {
 					</Grid>
 					<Padding width="10%" />
 					<Grid item>
-						<h4>In Green: {num_units_green} / {this.props.config.total_num_units}</h4>
-						<h4>In Yellow: {this.props.app.num_units_yellow} / {this.props.config.total_num_units}</h4>
-						<h4>In Red: {this.props.app.num_units_red} / {this.props.config.total_num_units}</h4>
+						<h4>Normal: {num_units_green} / {this.props.config.total_num_units}</h4>
+						<h4>Critical: {this.props.app.num_units_yellow} / {this.props.config.total_num_units}</h4>
+						<h4>Down: {this.props.app.num_units_red} / {this.props.config.total_num_units}</h4>
 					</Grid>
 					<Padding width="10%" />
 					<Grid item>
