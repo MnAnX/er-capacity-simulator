@@ -16,6 +16,7 @@ class AllUnits extends Component {
 		this.state = {
 			restart_id: this.props.app.restart_id,
 			total_num_units: this.props.config.total_num_units,
+			cols_per_row: 5,
 		}
 
 		this.initUnits = this.initUnits.bind(this)
@@ -23,6 +24,12 @@ class AllUnits extends Component {
 
 	componentWillMount() {
 		this.initUnits(this.state.total_num_units)
+  }
+
+	componentDidMount() {
+		if (window.innerWidth < 500) {
+			this.setState({ cols_per_row: 1 });
+		}
   }
 
 	componentWillReceiveProps(nextProps) {
@@ -54,7 +61,7 @@ class AllUnits extends Component {
 
 	render() {
 		return (
-			<GridList cellHeight={500} spacing={20} cols={5}>
+			<GridList cellHeight={500} spacing={20} cols={this.state.cols_per_row}>
         {Object.values(this.props.app.units).map(unit => (
 					<GridListTile key={unit.id} cols={1}>
 						<EmergencyRoom

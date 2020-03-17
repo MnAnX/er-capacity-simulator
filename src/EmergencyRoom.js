@@ -125,7 +125,6 @@ class EmergencyRoom extends Component {
 				new_patients_need_bed++
 			}
 		}
-		console.log("===== new_patients_need_icu: " + new_patients_need_icu)
 		// Put patients into bed
 		let num_available_beds = this.state.num_total_beds - beds_occupied.length
 		let assign_beds = Math.min(num_available_beds, new_patients_need_bed)
