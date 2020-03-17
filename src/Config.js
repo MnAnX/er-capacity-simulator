@@ -26,6 +26,9 @@ class Config extends Component {
 			staff_encounter_per_patient: this.props.config.staff_encounter_per_patient,
 			num_patients_growth_basis: this.props.config.num_patients_growth_basis,
 			num_patients_growth_factor: this.props.config.num_patients_growth_factor,
+			bed_turnover_days: this.props.config.bed_turnover_days,
+			icu_turnover_days: this.props.config.icu_turnover_days,
+			quanrentine_days: this.props.config.quanrentine_days,
 		}
   }
 
@@ -40,15 +43,38 @@ class Config extends Component {
 						helperText="How many hospitals/ERs in this area"
 						value={this.state.total_num_units}
 						onChange={(event)=>this.setState({total_num_units: event.target.value})} />
-					<Padding height={20}/>
+					<p>(You can change each hospital's configuration, such as number of providers, nurses, beds and ICUs, in the Run Simulation section by editing each block.)</p>
 					<div>
 						<p>
-			        Healthcare Worker Protection (Chance of health workers get infected when encounter a positive patient)
+			        <h4>Patients Incoming Rate:</h4>
+							(This describes how many new patients per day do you expect in the area.
+							We assume it grows exponentially based on the initial value and the growth factor.
+							For example, if you set the basis of 100 and factor to 1.2, the number of daily new patients will be:
+							20, 24, 28, 34, 42...)
 			      </p>
+						<div style={{display: 'flex', flexDirection: 'row'}}>
+							<TextField id="patients-growth-basis"
+								type='number'
+								variant="outlined"
+								label="Patients Growth Basis"
+								value={this.state.num_patients_growth_basis}
+								onChange={(event)=>this.setState({num_patients_growth_basis: event.target.value})} />
+							<Padding width={20}/>
+							<TextField id="patients-growth-factor"
+								type='number'
+								variant="outlined"
+								label="Patients Growth Factor"
+								value={this.state.num_patients_growth_factor}
+								onChange={(event)=>this.setState({num_patients_growth_factor: event.target.value})} />
+						</div>
+					</div>
+					<Padding height={20}/>
+					<div>
+						<h4> Healthcare Worker Protection (Chance of health workers get infected when encounter a positive patient) </h4>
 						<Slider
 							onChange={(event, value)=>this.setState({prob_of_staff_infected: value})}
-			        defaultValue={20}
-			        step={3}
+			        defaultValue={this.props.config.prob_of_staff_infected}
+			        step={1}
 							aria-labelledby="discrete-slider"
 			        valueLabelDisplay="auto"
 							min={0}
@@ -71,67 +97,60 @@ class Config extends Component {
 					</div>
 					<Padding height={10}/>
 					<div>
-						<p>
-			        Percentage of patients needs to be admitted (How many patients out of 100 will need a bed?)
-			      </p>
+						<h4> Percentage of patients needs to be admitted (How many patients out of 100 will need a bed?) </h4>
 						<Slider
 							onChange={(event, value)=>this.setState({prc_patients_needs_bed: value})}
-			        defaultValue={20}
+			        defaultValue={this.props.config.prc_patients_needs_bed}
 							getAriaValueText={(val)=>`${val}%`}
 			        aria-labelledby="discrete-slider"
 			        valueLabelDisplay="auto"
-			        step={10}
+			        step={1}
 			      />
 					</div>
 					<div>
-						<p>
-			        Percentage of patients needs ICU (How many patients out of 100 will need intensive care?)
-			      </p>
+						<h4> Percentage of patients needs ICU (How many patients out of 100 will need intensive care?) </h4>
 						<Slider
 							onChange={(event, value)=>this.setState({prc_patients_needs_icu: value})}
-			        defaultValue={2}
+			        defaultValue={this.props.config.prc_patients_needs_icu}
 							getAriaValueText={(val)=>`${val}%`}
 			        aria-labelledby="discrete-slider"
 			        valueLabelDisplay="auto"
-			        step={10}
+			        step={1}
 			      />
 					</div>
 					<div>
-						<p>
-			        On average, how many healthcare workers will each patient encounter?
-			      </p>
+						<h4> On average, how many healthcare workers will each patient encounter? </h4>
 						<Slider
 							onChange={(event, value)=>this.setState({staff_encounter_per_patient: value})}
-			        defaultValue={5}
+			        defaultValue={this.props.config.staff_encounter_per_patient}
 			        valueLabelDisplay="auto"
 			        step={1}
 							min={1}
 	        		max={50}
 			      />
 					</div>
-					<div>
-						<p>
-			        <p>Patients Incoming Rate:</p>
-							This describes how many new patients per day do you expect in the area.
-							We assume it grows exponentially based on the initial value and the growth factor.
-							For example, if you set the basis of 100 and factor to 1.2, the number of daily new patients will be:
-							20, 24, 28, 34, 42...
-			      </p>
-						<div style={{display: 'flex', flexDirection: 'row'}}>
-							<TextField id="patients-growth-basis"
-								type='number'
-								variant="outlined"
-								label="Patients Growth Basis"
-								value={this.state.num_patients_growth_basis}
-								onChange={(event)=>this.setState({num_patients_growth_basis: event.target.value})} />
-							<Padding width={20}/>
-							<TextField id="patients-growth-factor"
-								type='number'
-								variant="outlined"
-								label="Patients Growth Factor"
-								value={this.state.num_patients_growth_factor}
-								onChange={(event)=>this.setState({num_patients_growth_factor: event.target.value})} />
-						</div>
+					<br />
+					<div style={{display: 'flex', flexDirection: 'row'}}>
+						<TextField id="bed-turnover"
+							type='number'
+							variant="outlined"
+							label="Average Days to Discharge (Admitted)"
+							value={this.state.bed_turnover_days}
+							onChange={(event)=>this.setState({bed_turnover_days: event.target.value})} />
+						<Padding width={20}/>
+						<TextField id="icu-turnover"
+							type='number'
+							variant="outlined"
+							label="Average Days to Discharge (ICU)"
+							value={this.state.icu_turnover_days}
+							onChange={(event)=>this.setState({icu_turnover_days: event.target.value})} />
+						<Padding width={20}/>
+						<TextField id="icu-turnover"
+							type='number'
+							variant="outlined"
+							label="Quanrentine Days"
+							value={this.state.quanrentine_days}
+							onChange={(event)=>this.setState({quanrentine_days: event.target.value})} />
 					</div>
 				</Container>
 				<Padding height={20}/>
@@ -144,6 +163,9 @@ class Config extends Component {
 						staff_encounter_per_patient: this.state.staff_encounter_per_patient,
 						num_patients_growth_basis: this.state.num_patients_growth_basis,
 						num_patients_growth_factor: this.state.num_patients_growth_factor,
+						bed_turnover_days: this.state.bed_turnover_days,
+						icu_turnover_days: this.state.icu_turnover_days,
+						quanrentine_days: this.state.quanrentine_days,
 					})
 				}}>Update Configuration</Button>
 				<Padding height={20}/>

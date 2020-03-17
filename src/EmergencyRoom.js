@@ -23,8 +23,8 @@ class EmergencyRoom extends Component {
 			name: "Hospital_" + props.id,
 			num_total_providers: 10,
 			num_total_nurses: 30,
-			num_total_beds: 500,
-			num_total_icus: 30,
+			num_total_beds: 300,
+			num_total_icus: 25,
 			providers_quanrentined: [],
 			nurses_quanrentined: [],
 			beds_occupied: [],
@@ -52,7 +52,9 @@ class EmergencyRoom extends Component {
 			status_info: "",
 			status_color: "green",
 			providers_quanrentined: [],
+			nurses_quanrentined: [],
 			beds_occupied: [],
+			icus_occupied: [],
 		})
 	}
 
@@ -67,9 +69,9 @@ class EmergencyRoom extends Component {
 														.filter(days_in_quanrentine => days_in_quanrentine > 0)
 		// Calculate how many staffs may get infected due to the new incoming cases
 		let providers_in_duty = this.state.num_total_providers - providers_quanrentined.length
-		let encounters = Math.min(new_patients * this.props.config.staff_encounter_per_patient, providers_in_duty)
+		let provider_encounters = Math.min(new_patients, providers_in_duty)
 		let newly_infected_providers = 0
-		for (let i = 0; i < encounters; i++) {
+		for (let i = 0; i < provider_encounters; i++) {
 		  let roll_dice = Math.floor(Math.random() * Math.floor(100))
 			if (roll_dice < this.props.config.prob_of_staff_infected) {
 				newly_infected_providers++
@@ -101,49 +103,42 @@ class EmergencyRoom extends Component {
 			nurses_quanrentined.push(this.props.config.quanrentine_days)
 		}
 
-		// Calculate Beds Status
-		let beds_occupied = this.state.beds_occupied
+		// Calculate bed/ICU Status
 		// Check if any bed is released
+		let beds_occupied = this.state.beds_occupied
+		let icus_occupied = this.state.icus_occupied
 		beds_occupied = beds_occupied
+											.map(days_occupied => days_occupied - 1)
+											.filter(days_occupied => days_occupied > 0)
+		icus_occupied = icus_occupied
 											.map(days_occupied => days_occupied - 1)
 											.filter(days_occupied => days_occupied > 0)
 		// New patients that need bed
 		let new_patients_need_bed = 0
-		for (let i = 0; i < new_patients; i++) {
-			let roll_dice = Math.floor(Math.random() * Math.floor(100))
-			if (roll_dice < this.props.config.prc_patients_needs_bed) {
-				new_patients_need_bed++
-			}
-		}
-		let num_available_beds = this.state.num_total_beds - beds_occupied.length
-		// Put patients into bed
-		let assign_beds = Math.min(num_available_beds, new_patients_need_bed)
-		for (let i = 0; i < assign_beds; i++) {
-			beds_occupied.push(this.props.config.bed_turnover_days)
-		}
-		// TODO: when new_patients_need_bed > num_available_beds, need to transfer patients to other hospitals
-
-		// Calculate ICUs Status
-		let icus_occupied = this.state.icus_occupied
-		// Check if any bed is released
-		icus_occupied = icus_occupied
-											.map(days_occupied => days_occupied - 1)
-											.filter(days_occupied => days_occupied > 0)
-		// New patients that need ICU
 		let new_patients_need_icu = 0
 		for (let i = 0; i < new_patients; i++) {
 			let roll_dice = Math.floor(Math.random() * Math.floor(100))
 			if (roll_dice < this.props.config.prc_patients_needs_icu) {
 				new_patients_need_icu++
 			}
+			else if (roll_dice < (this.props.config.prc_patients_needs_bed + this.props.config.prc_patients_needs_icu)) {
+				new_patients_need_bed++
+			}
 		}
-		let num_available_icus = this.state.num_total_icus - icus_occupied.length
+		console.log("===== new_patients_need_icu: " + new_patients_need_icu)
+		// Put patients into bed
+		let num_available_beds = this.state.num_total_beds - beds_occupied.length
+		let assign_beds = Math.min(num_available_beds, new_patients_need_bed)
+		for (let i = 0; i < assign_beds; i++) {
+			beds_occupied.push(this.props.config.bed_turnover_days)
+		}
 		// Put patients into ICU
+		let num_available_icus = this.state.num_total_icus - icus_occupied.length
 		let assign_icus = Math.min(num_available_icus, new_patients_need_icu)
 		for (let i = 0; i < assign_icus; i++) {
 			icus_occupied.push(this.props.config.icu_turnover_days)
 		}
-		// TODO: when new_patients_need_icu > num_available_icus, need to transfer patients to other hospitals
+		// TODO: when having more patients than available beds/ICUs, need to transfer patients to the other units
 
 		// Calculate status of this ER unit
 		let available_providers = this.state.num_total_providers - providers_quanrentined.length
@@ -188,6 +183,7 @@ class EmergencyRoom extends Component {
 			providers_quanrentined,
 			nurses_quanrentined,
 			beds_occupied,
+			icus_occupied,
 			status,
 			status_info,
 			status_color,
