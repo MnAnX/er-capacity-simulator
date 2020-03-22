@@ -20,8 +20,9 @@ class Summary extends Component {
 				<Grid container justify="center">
 					<Grid item>
 						<h3>- Patients -</h3>
-						<h4>Daily New Patients: {this.props.app.num_new_patients}</h4>
-						<h4>Total Patients: {this.props.app.num_current_patients}</h4>
+						<h4>Daily Incoming Patients: {this.props.app.num_new_patients}</h4>
+						<h4>Total Admitted: {this.props.app.total_num_admitted}</h4>
+						<h4>Total In ICU: {this.props.app.total_num_in_icu}</h4>
 						<h4>Total Death: {this.props.app.total_num_death}</h4>
 						<h4>Total Recovered: {this.props.app.total_num_recovered}</h4>
 					</Grid>
@@ -29,10 +30,10 @@ class Summary extends Component {
 					<Grid item>
 						<h3>- Hospitals -</h3>
 						<h4>Normal: {num_units_green} / {this.props.config.total_num_units}</h4>
-						<h4>Total Available Providers: {this.props.app.total_available_providers}</h4>
-						<h4>Total Available Nurses: {this.props.app.total_available_nurses}</h4>
-						<h4>Total Available Beds: {this.props.app.total_available_beds}</h4>
-						<h4>Total Available ICUs: {this.props.app.total_available_icus}</h4>
+						<h4>Available Providers: {this.props.app.total_available_providers}</h4>
+						<h4>Available Nurses: {this.props.app.total_available_nurses}</h4>
+						<h4>Available Beds: {this.props.app.total_available_beds}</h4>
+						<h4>Available ICUs: {this.props.app.total_available_icus}</h4>
 						<h4>Total PPEs Consumed: {this.props.app.total_ppe_consumed}</h4>
 					</Grid>
 					<Padding width="10%" />

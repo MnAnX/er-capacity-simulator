@@ -28,6 +28,8 @@ const defaultState = {
 	total_available_beds: 0,
 	total_available_icus: 0,
 	total_ppe_consumed: 0,
+	total_num_admitted: 0,
+	total_num_in_icu: 0,
 }
 
 export default (state = defaultState, action) => {
@@ -63,6 +65,8 @@ export default (state = defaultState, action) => {
 			let total_available_beds = _.sum(Object.values(units).map(unit => unit.available_beds))
 			let total_available_icus = _.sum(Object.values(units).map(unit => unit.available_icus))
 			let total_ppe_consumed = _.sum(Object.values(units).map(unit => unit.ppe_consumed))
+			let total_num_admitted = _.sum(Object.values(units).map(unit => unit.num_admitted))
+			let total_num_in_icu = _.sum(Object.values(units).map(unit => unit.num_in_icu))
 			return {
         ...state,
         units,
@@ -79,6 +83,8 @@ export default (state = defaultState, action) => {
 				total_available_beds,
 				total_available_icus,
 				total_ppe_consumed,
+				total_num_admitted,
+				total_num_in_icu,
       };
 		case RESTART:
 			return {

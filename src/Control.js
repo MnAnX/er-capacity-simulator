@@ -19,23 +19,25 @@ class Control extends Component {
 		// dispatch new patients
 		let num_current_patients = this.props.app.num_current_patients
 		if (this.props.app.day_count === 0) {
-			// init patinet number
+			// init patient number
 			this.props.updateNumPatients(this.props.config.num_patients_growth_basis, 0)
 			num_current_patients = this.props.config.num_patients_growth_basis
 		}
 
-		// calculate number of new patients
-		let num_new_patients = Math.floor(num_current_patients * (this.props.config.num_patients_growth_factor - 1))
+		// calculate number of incoming patients
+		let num_total_patients = num_current_patients * this.props.config.num_patients_growth_factor
+		let incoming_patients = Math.floor(num_total_patients * (this.props.config.prc_patients_go_hospital / 100))
+		let updated_total_patients = num_total_patients - incoming_patients
 		// update patient number
-		this.props.updateNumPatients(num_current_patients + num_new_patients, num_new_patients)
+		this.props.updateNumPatients(updated_total_patients, incoming_patients)
 
 		// send new patients to units that are still operating
 		let available_units = Object.values(this.props.app.units).filter(unit => unit.status !== "Down")
 		// dispatch patients
-		if (num_new_patients > available_units.length) {
+		if (incoming_patients > available_units.length) {
 			// Send patients evenly to all the units
-			let incr = Math.floor(num_new_patients / available_units.length)
-			let remainder = num_new_patients % available_units.length
+			let incr = Math.floor(incoming_patients / available_units.length)
+			let remainder = incoming_patients % available_units.length
 			available_units.forEach((unit, i) => {
 				let new_patients = unit.new_patients + incr
 				if (remainder > 0) {
@@ -49,7 +51,7 @@ class Control extends Component {
 		} else {
 			// send patients randomly to units
 			available_units.map(unit => unit.new_patients = 0)
-			for (let i = 0; i < num_new_patients; i++) {
+			for (let i = 0; i < incoming_patients; i++) {
 				let index = Math.floor(Math.random() * Math.floor(available_units.length))
 				available_units[index].new_patients++
 			}

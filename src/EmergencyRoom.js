@@ -232,6 +232,8 @@ class EmergencyRoom extends Component {
 			available_beds,
 			available_icus,
 			ppe_consumed,
+			num_admitted: beds_occupied.length,
+			num_in_icu: icus_occupied.length,
 		})
 	}
 

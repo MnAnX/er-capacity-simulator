@@ -9,6 +9,7 @@ import TextField from '@material-ui/core/TextField';
 import Slider from '@material-ui/core/Slider';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
+import InputAdornment from '@material-ui/core/InputAdornment';
 
 import Padding from './components/Padding'
 
@@ -26,6 +27,7 @@ class Config extends Component {
 			staff_encounter_per_patient: this.props.config.staff_encounter_per_patient,
 			num_patients_growth_basis: this.props.config.num_patients_growth_basis,
 			num_patients_growth_factor: this.props.config.num_patients_growth_factor,
+			prc_patients_go_hospital: this.props.config.prc_patients_go_hospital,
 			bed_turnover_days: this.props.config.bed_turnover_days,
 			icu_turnover_days: this.props.config.icu_turnover_days,
 			quanrentine_days: this.props.config.quanrentine_days,
@@ -50,16 +52,17 @@ class Config extends Component {
 					<div>
 						<p>
 			        <h4>Patients Incoming Rate:</h4>
-							(This describes how many new patients per day do you expect in the area.
-							We assume it grows exponentially based on the initial value and the growth factor.
-							For example, if you set the basis of 100 and factor to 1.2, the number of daily new patients will be:
-							20, 24, 28, 34, 42...)
+							(This describes how many patients you'd expect in the area.
+							We assume it grows exponentially based on the initial number of positive cases, and the growth factor.
+							For example, if you set the number of positives to 100 and factor to 1.2,
+							the number of positive patients becomes 120, 144, 172, etc..
+							You can then set the percent of these patients that's expected to come to the hospital for treatment.)
 			      </p>
 						<div style={{display: 'flex', flexDirection: 'row'}}>
 							<TextField id="patients-growth-basis"
 								type='number'
 								variant="outlined"
-								label="Patients Growth Basis"
+								label="Initial Number of Positive COVID Patients"
 								value={this.state.num_patients_growth_basis}
 								onChange={(event)=>this.setState({num_patients_growth_basis: event.target.value})} />
 							<Padding width={20}/>
@@ -69,9 +72,16 @@ class Config extends Component {
 								label="Patients Growth Factor"
 								value={this.state.num_patients_growth_factor}
 								onChange={(event)=>this.setState({num_patients_growth_factor: event.target.value})} />
+							<Padding width={20}/>
+							<TextField id="prc-patients-gp-hospital"
+								type='number'
+								variant="outlined"
+								label="Percentage of Patients that Go To Hospital"
+								value={this.state.prc_patients_go_hospital}
+								onChange={(event)=>this.setState({prc_patients_go_hospital: event.target.value})} />
 						</div>
 					</div>
-					<Padding height={30}/>
+					<h4>Discharge Rate:</h4>
 					<div style={{display: 'flex', flexDirection: 'row'}}>
 						<TextField id="bed-turnover"
 							type='number'
@@ -117,16 +127,16 @@ class Config extends Component {
 	        		max={80}
 			        marks={[
 											{
-										    value: 50,
-										    label: 'No Protection (50%)',
+										    value: 1,
+										    label: 'Full PPE',
 										  },
 										  {
 										    value: 20,
-										    label: 'Basic Protection - Surgical Mask (20%)',
+										    label: 'Basic PPE',
 										  },
-										  {
-										    value: 3,
-										    label: 'Full Protection (< 5%)',
+											{
+										    value: 80,
+										    label: 'No PPE',
 										  },
 										]}
 			      />
@@ -198,6 +208,7 @@ class Config extends Component {
 						staff_encounter_per_patient: this.state.staff_encounter_per_patient,
 						num_patients_growth_basis: this.state.num_patients_growth_basis,
 						num_patients_growth_factor: this.state.num_patients_growth_factor,
+						prc_patients_go_hospital: this.state.prc_patients_go_hospital,
 						bed_turnover_days: this.state.bed_turnover_days,
 						icu_turnover_days: this.state.icu_turnover_days,
 						quanrentine_days: this.state.quanrentine_days,
