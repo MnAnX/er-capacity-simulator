@@ -34,7 +34,7 @@ class Control extends Component {
 		// dispatch patients
 		if (num_new_patients > available_units.length) {
 			// Send patients evenly to all the units
-			let incr = num_new_patients / available_units.length
+			let incr = Math.floor(num_new_patients / available_units.length)
 			let remainder = num_new_patients % available_units.length
 			available_units.forEach((unit, i) => {
 				let new_patients = unit.new_patients + incr

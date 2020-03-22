@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 import {
 	DAY_INCREASE,
 	RESET_UNITS,
@@ -19,6 +21,13 @@ const defaultState = {
 	num_units_understaffed: 0,
 	num_units_no_icu: 0,
 	num_units_no_bed: 0,
+	total_num_recovered: 0,
+	total_num_death: 0,
+	total_available_providers: 0,
+	total_available_nurses: 0,
+	total_available_beds: 0,
+	total_available_icus: 0,
+	total_ppe_consumed: 0,
 }
 
 export default (state = defaultState, action) => {
@@ -47,6 +56,13 @@ export default (state = defaultState, action) => {
 			let num_units_understaffed = Object.values(units).filter(unit => unit.status_info.includes("Understaffed") || unit.status_info.includes("No Provider") || unit.status_info.includes("No Nurse")).length
 			let num_units_no_icu = Object.values(units).filter(unit => unit.status_info.includes("No ICU")).length
 			let num_units_no_bed = Object.values(units).filter(unit => unit.status_info.includes("Can't Admit")).length
+			let total_num_recovered = _.sum(Object.values(units).map(unit => unit.num_recovered))
+			let total_num_death = _.sum(Object.values(units).map(unit => unit.num_death))
+			let total_available_providers = _.sum(Object.values(units).map(unit => unit.available_providers))
+			let total_available_nurses = _.sum(Object.values(units).map(unit => unit.available_nurses))
+			let total_available_beds = _.sum(Object.values(units).map(unit => unit.available_beds))
+			let total_available_icus = _.sum(Object.values(units).map(unit => unit.available_icus))
+			let total_ppe_consumed = _.sum(Object.values(units).map(unit => unit.ppe_consumed))
 			return {
         ...state,
         units,
@@ -56,14 +72,17 @@ export default (state = defaultState, action) => {
 				num_units_understaffed,
 				num_units_no_icu,
 				num_units_no_bed,
+				total_num_recovered,
+				total_num_death,
+				total_available_providers,
+				total_available_nurses,
+				total_available_beds,
+				total_available_icus,
+				total_ppe_consumed,
       };
 		case RESTART:
 			return {
-				...state,
-				day_count: 0,
-				num_current_patients: 0,
-				num_new_patients: 0,
-				num_untreated_patients: 0,
+				...defaultState,
 				restart_id: state.restart_id + 1,
 			}
 		case UPDATE_NUM_PATIENTS:

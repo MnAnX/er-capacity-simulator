@@ -61,7 +61,7 @@ class AllUnits extends Component {
 
 	render() {
 		return (
-			<GridList cellHeight={500} spacing={20} cols={this.state.cols_per_row}>
+			<GridList cellHeight={520} spacing={20} cols={this.state.cols_per_row}>
         {Object.values(this.props.app.units).map(unit => (
 					<GridListTile key={unit.id} cols={1}>
 						<EmergencyRoom

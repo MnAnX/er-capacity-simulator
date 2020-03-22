@@ -29,10 +29,15 @@ class EmergencyRoom extends Component {
 			nurses_quanrentined: [],
 			beds_occupied: [],
 			icus_occupied: [],
+			num_recovered: 0,
+			num_death: 0,
+			ppe_consumed: 0,
 		}
 
 		this.dailyCalc = this.dailyCalc.bind(this)
 		this.clearState = this.clearState.bind(this)
+		this.rollDice = this.rollDice.bind(this)
+		this.probLoop = this.probLoop.bind(this)
   }
 
 	componentWillReceiveProps(nextProps) {
@@ -55,11 +60,37 @@ class EmergencyRoom extends Component {
 			nurses_quanrentined: [],
 			beds_occupied: [],
 			icus_occupied: [],
+			num_recovered: 0,
+			num_death: 0,
+			ppe_consumed: 0,
 		})
+	}
+
+	rollDice(quantile) {
+		let roll_dice = Math.floor(Math.random() * Math.floor(100))
+		if (roll_dice < quantile) {
+			return true
+		}
+		return false
+	}
+
+	probLoop(total, prob) {
+		let counter = 0
+		for (let i = 0; i < total; i++) {
+			if (this.rollDice(prob)) {
+				counter++
+			}
+		}
+		return counter
 	}
 
 	dailyCalc(unitState) {
 		let new_patients = unitState.new_patients
+
+		// Calculate PPE consume
+		let num_ppe_consumed_first_encounter = new_patients * this.props.config.ppe_per_patient_first_encounter
+		let num_ppe_consumed_admitted = (this.state.beds_occupied.length + this.state.icus_occupied.length) * this.props.config.ppe_per_patient_admitted_daily
+		let ppe_consumed = this.state.ppe_consumed + num_ppe_consumed_first_encounter + num_ppe_consumed_admitted
 
 		// Calculate Providers Status
 		let providers_quanrentined = this.state.providers_quanrentined
@@ -70,13 +101,7 @@ class EmergencyRoom extends Component {
 		// Calculate how many staffs may get infected due to the new incoming cases
 		let providers_in_duty = this.state.num_total_providers - providers_quanrentined.length
 		let provider_encounters = Math.min(new_patients, providers_in_duty)
-		let newly_infected_providers = 0
-		for (let i = 0; i < provider_encounters; i++) {
-		  let roll_dice = Math.floor(Math.random() * Math.floor(100))
-			if (roll_dice < this.props.config.prob_of_staff_infected) {
-				newly_infected_providers++
-			}
-		}
+		let newly_infected_providers = this.probLoop(provider_encounters, this.props.config.prob_of_staff_infected)
 		// Each infected staff needs to start self-quanrentine
 		for (let i = 0; i < newly_infected_providers; i++) {
 			providers_quanrentined.push(this.props.config.quanrentine_days)
@@ -91,13 +116,7 @@ class EmergencyRoom extends Component {
 		// Calculate how many staffs may get infected due to the new incoming cases
 		let nurses_in_duty = this.state.num_total_nurses - nurses_quanrentined.length
 		let nurse_encounters = Math.min(new_patients * this.props.config.staff_encounter_per_patient, nurses_in_duty)
-		let newly_infected_nurses = 0
-		for (let i = 0; i < nurse_encounters; i++) {
-		  let roll_dice = Math.floor(Math.random() * Math.floor(100))
-			if (roll_dice < this.props.config.prob_of_staff_infected) {
-				newly_infected_nurses++
-			}
-		}
+		let newly_infected_nurses = this.probLoop(nurse_encounters, this.props.config.prob_of_staff_infected)
 		// Each infected staff needs to start self-quanrentine
 		for (let i = 0; i < newly_infected_nurses; i++) {
 			nurses_quanrentined.push(this.props.config.quanrentine_days)
@@ -107,12 +126,19 @@ class EmergencyRoom extends Component {
 		// Check if any bed is released
 		let beds_occupied = this.state.beds_occupied
 		let icus_occupied = this.state.icus_occupied
+		let total_occupied = beds_occupied.length + icus_occupied.length
 		beds_occupied = beds_occupied
 											.map(days_occupied => days_occupied - 1)
 											.filter(days_occupied => days_occupied > 0)
 		icus_occupied = icus_occupied
 											.map(days_occupied => days_occupied - 1)
 											.filter(days_occupied => days_occupied > 0)
+		// Calculate number of recovery and death
+		let patients_out = total_occupied - beds_occupied.length - icus_occupied.length
+		let newly_num_death = this.probLoop(patients_out, this.props.config.mortality_rate)
+		let newly_num_recovered = patients_out - newly_num_death
+		let num_death = this.state.num_death + newly_num_death
+		let num_recovered = this.state.num_recovered + newly_num_recovered
 		// New patients that need bed
 		let new_patients_need_bed = 0
 		let new_patients_need_icu = 0
@@ -190,12 +216,22 @@ class EmergencyRoom extends Component {
 			status,
 			status_info,
 			status_color,
+			num_recovered,
+			num_death,
+			ppe_consumed,
 		})
 
 		// Update the centralized unit status
 		this.props.updateUnit(this.state.id, {
 			status,
 			status_info,
+			num_recovered,
+			num_death,
+			available_providers,
+			available_nurses,
+			available_beds,
+			available_icus,
+			ppe_consumed,
 		})
 	}
 
@@ -247,6 +283,8 @@ class EmergencyRoom extends Component {
 						{"Beds Available: " + (this.state.num_total_beds - this.state.beds_occupied.length)}
 						<br />
 						{"ICUs Available: " + (this.state.num_total_icus - this.state.icus_occupied.length)}
+						<br />
+						{"PPEs Consumed: " + this.state.ppe_consumed}
 				</CardContent>
 			</Card>
 		);

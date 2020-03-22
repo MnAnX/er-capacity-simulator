@@ -29,6 +29,9 @@ class Config extends Component {
 			bed_turnover_days: this.props.config.bed_turnover_days,
 			icu_turnover_days: this.props.config.icu_turnover_days,
 			quanrentine_days: this.props.config.quanrentine_days,
+			ppe_per_patient_first_encounter: this.props.config.ppe_per_patient_first_encounter,
+			ppe_per_patient_admitted_daily: this.props.config.ppe_per_patient_admitted_daily,
+			mortality_rate: this.props.config.mortality_rate,
 		}
   }
 
@@ -68,7 +71,40 @@ class Config extends Component {
 								onChange={(event)=>this.setState({num_patients_growth_factor: event.target.value})} />
 						</div>
 					</div>
-					<Padding height={20}/>
+					<Padding height={30}/>
+					<div style={{display: 'flex', flexDirection: 'row'}}>
+						<TextField id="bed-turnover"
+							type='number'
+							variant="outlined"
+							label="Average Days to Discharge (Admitted)"
+							value={this.state.bed_turnover_days}
+							onChange={(event)=>this.setState({bed_turnover_days: event.target.value})} />
+						<Padding width={20}/>
+						<TextField id="icu-turnover"
+							type='number'
+							variant="outlined"
+							label="Average Days to Discharge (ICU)"
+							value={this.state.icu_turnover_days}
+							onChange={(event)=>this.setState({icu_turnover_days: event.target.value})} />
+						<Padding width={20}/>
+						<TextField id="icu-turnover"
+							type='number'
+							variant="outlined"
+							label="Quanrentine Days"
+							value={this.state.quanrentine_days}
+							onChange={(event)=>this.setState({quanrentine_days: event.target.value})} />
+					</div>
+					<div>
+						<h4> On average, how many healthcare workers will each patient encounter? </h4>
+						<Slider
+							onChange={(event, value)=>this.setState({staff_encounter_per_patient: value})}
+			        defaultValue={this.props.config.staff_encounter_per_patient}
+			        valueLabelDisplay="auto"
+			        step={1}
+							min={1}
+	        		max={50}
+			      />
+					</div>
 					<div>
 						<h4> Healthcare Worker Protection (Chance of health workers get infected when encounter a positive patient) </h4>
 						<Slider
@@ -86,7 +122,7 @@ class Config extends Component {
 										  },
 										  {
 										    value: 20,
-										    label: 'Basic Protection - Mask and Goggle (20%)',
+										    label: 'Basic Protection - Surgical Mask (20%)',
 										  },
 										  {
 										    value: 3,
@@ -119,38 +155,37 @@ class Config extends Component {
 			      />
 					</div>
 					<div>
-						<h4> On average, how many healthcare workers will each patient encounter? </h4>
+						<h4> Mortality Rate </h4>
 						<Slider
-							onChange={(event, value)=>this.setState({staff_encounter_per_patient: value})}
-			        defaultValue={this.props.config.staff_encounter_per_patient}
+							onChange={(event, value)=>this.setState({mortality_rate: value})}
+			        defaultValue={this.props.config.mortality_rate}
+			        valueLabelDisplay="auto"
+			        step={0.1}
+							min={1}
+	        		max={20}
+			      />
+					</div>
+					<div>
+						<h4> How many PPEs are required for the first encounter of a patient? </h4>
+						<Slider
+							onChange={(event, value)=>this.setState({ppe_per_patient_first_encounter: value})}
+			        defaultValue={this.props.config.ppe_per_patient_first_encounter}
 			        valueLabelDisplay="auto"
 			        step={1}
 							min={1}
-	        		max={50}
+	        		max={100}
 			      />
 					</div>
-					<br />
-					<div style={{display: 'flex', flexDirection: 'row'}}>
-						<TextField id="bed-turnover"
-							type='number'
-							variant="outlined"
-							label="Average Days to Discharge (Admitted)"
-							value={this.state.bed_turnover_days}
-							onChange={(event)=>this.setState({bed_turnover_days: event.target.value})} />
-						<Padding width={20}/>
-						<TextField id="icu-turnover"
-							type='number'
-							variant="outlined"
-							label="Average Days to Discharge (ICU)"
-							value={this.state.icu_turnover_days}
-							onChange={(event)=>this.setState({icu_turnover_days: event.target.value})} />
-						<Padding width={20}/>
-						<TextField id="icu-turnover"
-							type='number'
-							variant="outlined"
-							label="Quanrentine Days"
-							value={this.state.quanrentine_days}
-							onChange={(event)=>this.setState({quanrentine_days: event.target.value})} />
+					<div>
+						<h4> How many PPEs are required daily for caring an admitted (or ICU) patient? </h4>
+						<Slider
+							onChange={(event, value)=>this.setState({ppe_per_patient_admitted_daily: value})}
+			        defaultValue={this.props.config.ppe_per_patient_admitted_daily}
+			        valueLabelDisplay="auto"
+			        step={1}
+							min={1}
+	        		max={100}
+			      />
 					</div>
 				</Container>
 				<Padding height={20}/>
@@ -166,6 +201,9 @@ class Config extends Component {
 						bed_turnover_days: this.state.bed_turnover_days,
 						icu_turnover_days: this.state.icu_turnover_days,
 						quanrentine_days: this.state.quanrentine_days,
+						ppe_per_patient_first_encounter: this.state.ppe_per_patient_first_encounter,
+						ppe_per_patient_admitted_daily: this.state.ppe_per_patient_admitted_daily,
+						mortality_rate: this.state.mortality_rate,
 					})
 				}}>Update Configuration</Button>
 				<Padding height={20}/>

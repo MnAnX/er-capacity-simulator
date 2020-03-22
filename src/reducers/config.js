@@ -14,6 +14,9 @@ const defaultState = {
 	staff_encounter_per_patient: 3,
 	num_patients_growth_basis: 50,
 	num_patients_growth_factor: 1.2,
+	ppe_per_patient_first_encounter: 5,
+	ppe_per_patient_admitted_daily: 10,
+	mortality_rate: 2,
 }
 
 export default (state = defaultState, action) => {
@@ -31,6 +34,9 @@ export default (state = defaultState, action) => {
 				bed_turnover_days: parseInt(action.config.bed_turnover_days),
 				icu_turnover_days: parseInt(action.config.icu_turnover_days),
 				quanrentine_days: parseInt(action.config.quanrentine_days),
+				ppe_per_patient_first_encounter: parseInt(action.config.ppe_per_patient_first_encounter),
+				ppe_per_patient_admitted_daily: parseInt(action.config.ppe_per_patient_admitted_daily),
+				mortality_rate: parseInt(action.config.mortality_rate),
       });
 		default:
 			return state;
