@@ -1,2 +1,2 @@
-# er-capacity-simulator
- Simulate ER capacity in the area during an epidemic
+# ER Capacity Simulator
+ Simulates patient load and hospital response to the COVID-19 outbreak
