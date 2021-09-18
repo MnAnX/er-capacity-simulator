@@ -147,7 +147,7 @@ class EmergencyRoom extends Component {
 			if (roll_dice < this.props.config.prc_patients_needs_icu) {
 				new_patients_need_icu++
 			}
-			else if (roll_dice < (this.props.config.prc_patients_needs_bed + this.props.config.prc_patients_needs_icu)) {
+			else if (roll_dice < (this.props.config.prc_patients_needs_bed)) {
 				new_patients_need_bed++
 			}
 		}

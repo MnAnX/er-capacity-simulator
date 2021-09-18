@@ -25,7 +25,8 @@ function App() {
     <ThemeProvider theme={theme}>
       <Container>
         <h1>COVID-19: ER Capacity Simulator</h1>
-        <p><a href='https://github.com/MnAnX/er-capacity-simulator'>github.com/MnAnX/er-capacity-simulator</a></p>
+        <p>Author: <a href='https://www.linkedin.com/in/nanxiao85/'>Nan Xiao</a></p>
+        <p>Code: <a href='https://github.com/MnAnX/er-capacity-simulator'>github.com/MnAnX/er-capacity-simulator</a></p>
         <Container>
           <Paper>
             <Container>
